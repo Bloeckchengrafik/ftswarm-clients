@@ -1,0 +1,7 @@
+modules:
+  - codegen
+  - ftswarm-kotlin-client
+  - ftswarm-kotlin-playground
+
+plugins:
+  - codegen

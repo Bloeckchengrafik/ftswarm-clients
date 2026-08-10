@@ -1,0 +1,101 @@
+name: stepper
+init:
+  - !<set_io_type>
+    type: SWOSIO_STEPPER
+    parameters: [ ]
+  - !<subscribe>
+
+subscription: !<bitset>
+  - name: running
+    enabled: always
+    mask: 0x01
+    parser: boolean
+    initialValue: &isRunning
+      command: isRunning
+      parameters: [ ]
+      returnType: boolean
+  - name: homing
+    enabled: always
+    mask: 0x02
+    parser: boolean
+    initialValue: &isHoming
+      command: isHoming
+      parameters: [ ]
+      returnType: boolean
+  - name: distance
+    enabled: requested
+    mask: 0x04
+    parser: int
+    initialValue: &distance
+      command: getDistance
+      parameters: [ ]
+      returnType: int
+  - name: position
+    enabled: default
+    mask: 0x08
+    parser: int
+    initialValue: &position
+      command: getPosition
+      parameters: [ ]
+      returnType: int
+
+members:
+  setDistance:
+    command: setDistance
+    parameters:
+      - name: distance
+        type: int
+      - name: relative
+        type: boolean
+        defaultValue: false
+    returnType: ok
+  getDistance: *distance
+  setPosition:
+    command: setPosition
+    parameters:
+      - name: position
+        type: int
+    returnType: ok
+  getPosition: *position
+  setSpeed:
+    command: setSpeed
+    parameters:
+      - name: speed
+        type: int
+    returnType: ok
+  getSpeed:
+    command: getSpeed
+    parameters: [ ]
+    returnType: int
+  setMotionType:
+    command: setMotionType
+    parameters:
+      - name: motionType
+        type: int
+    returnType: ok
+  getMotionType:
+    command: getMotionType
+    parameters: [ ]
+    returnType: int
+  run:
+    command: run
+    parameters: [ ]
+    returnType: ok
+  isRunning: *isRunning
+  stop:
+    command: stop
+    parameters: [ ]
+    returnType: ok
+  homing:
+    command: homing
+    parameters:
+      - name: maxSteps
+        type: int
+    returnType: ok
+  isHoming: *isHoming
+  setHomingOffset:
+    command: setHomingOffset
+    parameters:
+      - name: offset
+        type: int
+    returnType: ok

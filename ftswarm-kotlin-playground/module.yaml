@@ -1,0 +1,11 @@
+product: jvm/app
+
+apply:
+  - ../common.module-template.yaml
+
+dependencies:
+  - $libs.kotlinx.coroutines.core
+  - $libs.kotlin.logging.jvm
+  - $libs.slf4j.api
+  - $libs.slf4j.jdk14
+  - ../ftswarm-kotlin-client

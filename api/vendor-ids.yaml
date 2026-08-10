@@ -1,0 +1,7 @@
+# ftSwarmControlUSBC, ftSwarmDuino, ftSwarmPwrDrive, ftSwarmRC, ftSwarmRS, ftSwarmXL
+- vid: 0x1a86
+  pid: 0x7523
+
+# ftSwarmControlUSBMicro
+- vid: 0x10c4
+  pid: 0xea60

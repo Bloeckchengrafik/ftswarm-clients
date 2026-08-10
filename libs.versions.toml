@@ -1,0 +1,6 @@
+[libraries]
+kotlinx-coroutines-core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0"
+jSerialComm = "com.fazecast:jSerialComm:2.11.4"
+kotlin-logging-jvm = "io.github.oshai:kotlin-logging-jvm:4.0.0"
+slf4j-api = "org.slf4j:slf4j-api:2.0.18"
+slf4j-jdk14 = "org.slf4j:slf4j-jdk14:2.0.18"

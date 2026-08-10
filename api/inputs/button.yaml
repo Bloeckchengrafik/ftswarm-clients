@@ -1,0 +1,10 @@
+name: button
+extends: value-boolean
+init:
+#  - !<set_io_type>
+#    type: SWOSIO_BUTTON
+#    parameters:
+#      - name: normallyOpen
+#        type: boolean
+#        defaultValue: false # optional
+  - !<subscribe>

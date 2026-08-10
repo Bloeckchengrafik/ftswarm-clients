@@ -1,0 +1,14 @@
+product: jvm/lib
+
+dependencies:
+  - $libs.kotlinx.coroutines.core
+  - $libs.jSerialComm
+  - $libs.kotlin.logging.jvm
+  - $libs.slf4j.api
+
+plugins:
+  codegen:
+    enabled: true
+
+apply:
+  - ../common.module-template.yaml

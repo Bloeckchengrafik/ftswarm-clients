@@ -1,0 +1,9 @@
+subscription: !<value>
+  parser: boolean
+  initialValue: &valueFunction
+    command: getValue
+    parameters: []
+    returnType: boolean
+
+members:
+  getValue: *valueFunction

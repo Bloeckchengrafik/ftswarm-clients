@@ -1,0 +1,3 @@
+package io.github.elektrofuzzis.ftswarm_clients.kotlin
+
+interface FtSwarmProtocolObject
