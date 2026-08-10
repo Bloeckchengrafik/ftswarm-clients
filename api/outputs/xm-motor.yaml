@@ -1,0 +1,5 @@
+name: xmMotor
+extends: actor
+init:
+  - !<set_io_type>
+    type: SWOSIO_XMMOTOR

@@ -6,7 +6,10 @@ sealed interface SucceedingCommandReturnValue {
     data class BooleanValue(val value: Boolean) : SucceedingCommandReturnValue
     data class StringValue(val value: String) : SucceedingCommandReturnValue
     data class FloatValue(val value: Float) : SucceedingCommandReturnValue
-    data class JoystickValue(val lr: Float, val fb: Float) : SucceedingCommandReturnValue
+    data class JoystickValue(val lr: Float, val fb: Float) : SucceedingCommandReturnValue {
+        val value: SubscriptionJoystickValue
+            get() = SubscriptionJoystickValue(lr, fb)
+    }
 }
 
 sealed interface ReturnValueParser<T : SucceedingCommandReturnValue> {

@@ -1,0 +1,10 @@
+name: analog
+extends: value-int
+init:
+  - !<set_io_type>
+    type: SWOSIO_ANALOG
+    parameters:
+      - name: normallyOpen
+        type: boolean
+        defaultValue: false
+  - !<subscribe>

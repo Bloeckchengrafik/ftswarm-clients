@@ -23,6 +23,8 @@ private fun renderIoObject(definition: IoDefinition): String {
         .filterIsInstance<InitStep.SetIoType>()
         .flatMap { it.parameters }
     val subscription = definition.subscription
+    val usesJoystick = definition.members.values.any { it.returnType == ApiType.Joystick } ||
+        (subscription is SubscriptionDefinition.Value && subscription.parser == ApiType.Joystick)
 
     return buildString {
         appendLine("package io.github.elektrofuzzis.ftswarm_clients.kotlin.objects")
@@ -35,6 +37,9 @@ private fun renderIoObject(definition: IoDefinition): String {
         appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.Command")
         appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.CommandRequest")
         appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.ReturnValueParser")
+        if (usesJoystick) {
+            appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.SubscriptionJoystickValue")
+        }
         if (subscription != null) {
             appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.SubscriptionParser")
             appendLine("import kotlinx.coroutines.flow.SharingStarted")
@@ -351,6 +356,7 @@ private fun ApiType.kotlinType(): String = when (this) {
     ApiType.Int -> "Int"
     ApiType.Float -> "Float"
     ApiType.String -> "String"
+    ApiType.Joystick -> "SubscriptionJoystickValue"
     ApiType.Ok -> "Unit"
 }
 
@@ -359,6 +365,7 @@ private fun ApiType.commandParameter(): String = when (this) {
     ApiType.Int -> "int"
     ApiType.Float -> "float"
     ApiType.String -> "string"
+    ApiType.Joystick -> error("joystick is not a command parameter type")
     ApiType.Ok -> error("ok is not a command parameter type")
 }
 
@@ -367,6 +374,7 @@ private fun ApiType.returnValueParser(): String = when (this) {
     ApiType.Int -> "IntValue"
     ApiType.Float -> "FloatValue"
     ApiType.String -> "StringValue"
+    ApiType.Joystick -> "JoystickValue"
     ApiType.Ok -> "Ok"
 }
 
@@ -375,6 +383,7 @@ private fun ApiType.subscriptionParser(): String = when (this) {
     ApiType.Int -> "int"
     ApiType.Float -> "float"
     ApiType.String -> "string"
+    ApiType.Joystick -> "joystick"
     ApiType.Ok -> error("ok is not a subscription value type")
 }
 

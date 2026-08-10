@@ -1,0 +1,10 @@
+name: counter
+extends: value-int
+init:
+  - !<set_io_type>
+    type: SWOSIO_COUNTER
+    parameters:
+      - name: normallyOpen
+        type: boolean
+        defaultValue: false
+  - !<subscribe>

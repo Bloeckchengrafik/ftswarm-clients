@@ -1,0 +1,46 @@
+name: pixel
+members:
+  setColor:
+    command: setColor
+    parameters:
+      - name: color
+        type: int
+    returnType: ok
+  getColor:
+    command: getColor
+    parameters: []
+    returnType: string
+  setBrightness:
+    command: setBrightness
+    parameters:
+      - name: brightness
+        type: int
+    returnType: ok
+  getBrightness:
+    command: getBrightness
+    parameters: []
+    returnType: int
+  setBlink:
+    command: setBlink
+    parameters:
+      - name: period
+        type: int
+      - name: signal
+        type: int
+      - name: duty
+        type: int
+      - name: pause
+        type: int
+      - name: color1
+        type: int
+      - name: color2
+        type: int
+      - name: color3
+        type: int
+    returnType: ok
+  revokeEffect:
+    command: revokeEffect
+    parameters:
+      - name: color
+        type: int
+    returnType: ok

@@ -104,6 +104,9 @@ enum class ApiType {
     @SerialName("string")
     String,
 
+    @SerialName("joystick")
+    Joystick,
+
     @SerialName("ok")
     Ok,
 }
@@ -250,12 +253,16 @@ private fun validateFunction(ioName: String, function: FunctionDefinition) {
 
 private fun validateParameter(ioName: String, parameter: ParameterDefinition) {
     require(parameter.name.isNotBlank()) { "$ioName: parameter names cannot be blank" }
+    require(parameter.type != ApiType.Ok && parameter.type != ApiType.Joystick) {
+        "$ioName.${parameter.name}: ${parameter.type} cannot be used as a command parameter"
+    }
     val default = parameter.defaultValueText() ?: return
     val valid = when (parameter.type) {
         ApiType.Boolean -> default.toBooleanStrictOrNull() != null
         ApiType.Int -> default.toIntOrNull() != null
         ApiType.Float -> default.toFloatOrNull() != null
         ApiType.String -> true
+        ApiType.Joystick -> false
         ApiType.Ok -> false
     }
     require(valid) { "$ioName.${parameter.name}: invalid ${parameter.type} default '$default'" }

@@ -1,0 +1,30 @@
+name: lamp
+extends: actor
+init:
+  - !<set_io_type>
+    type: SWOSIO_LAMP
+members:
+  setBlink:
+    command: setBlink
+    parameters:
+      - name: period
+        type: int
+      - name: signal
+        type: int
+      - name: duty
+        type: int
+      - name: pause
+        type: int
+      - name: brightness1
+        type: int
+      - name: brightness2
+        type: int
+      - name: brightness3
+        type: int
+    returnType: ok
+  revokeEffect:
+    command: revokeEffect
+    parameters:
+      - name: brightness
+        type: int
+    returnType: ok

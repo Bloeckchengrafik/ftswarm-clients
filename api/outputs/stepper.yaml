@@ -1,4 +1,5 @@
 name: stepper
+extends: actor
 init:
   - !<set_io_type>
     type: SWOSIO_STEPPER
@@ -57,26 +58,6 @@ members:
         type: int
     returnType: ok
   getPosition: *position
-  setSpeed:
-    command: setSpeed
-    parameters:
-      - name: speed
-        type: int
-    returnType: ok
-  getSpeed:
-    command: getSpeed
-    parameters: [ ]
-    returnType: int
-  setMotionType:
-    command: setMotionType
-    parameters:
-      - name: motionType
-        type: int
-    returnType: ok
-  getMotionType:
-    command: getMotionType
-    parameters: [ ]
-    returnType: int
   run:
     command: run
     parameters: [ ]
@@ -99,3 +80,4 @@ members:
       - name: offset
         type: int
     returnType: ok
+

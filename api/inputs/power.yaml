@@ -1,0 +1,15 @@
+name: power
+extends: value-int
+init:
+  - !<set_io_type>
+    type: SWOSIO_POWER
+    parameters:
+      - name: normallyOpen
+        type: boolean
+        defaultValue: false
+  - !<subscribe>
+members:
+  getVoltage:
+    command: getVoltage
+    parameters: []
+    returnType: float

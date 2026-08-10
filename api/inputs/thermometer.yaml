@@ -1,0 +1,23 @@
+name: thermometer
+extends: value-int
+init:
+  - !<set_io_type>
+    type: SWOSIO_THERMOMETER
+    parameters:
+      - name: normallyOpen
+        type: boolean
+        defaultValue: false
+  - !<subscribe>
+members:
+  getKelvin:
+    command: getKelvin
+    parameters: []
+    returnType: float
+  getCelsius:
+    command: getCelcius
+    parameters: []
+    returnType: float
+  getFahrenheit:
+    command: getFahrenheit
+    parameters: []
+    returnType: float

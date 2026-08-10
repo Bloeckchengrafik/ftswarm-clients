@@ -1,0 +1,21 @@
+members:
+  setPosition:
+    command: setPosition
+    parameters:
+      - name: position
+        type: int
+    returnType: ok
+  getPosition:
+    command: getPosition
+    parameters: []
+    returnType: int
+  setOffset:
+    command: setOffset
+    parameters:
+      - name: offset
+        type: int
+    returnType: ok
+  getOffset:
+    command: getOffset
+    parameters: []
+    returnType: int

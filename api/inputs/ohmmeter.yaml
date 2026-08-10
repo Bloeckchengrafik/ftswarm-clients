@@ -1,0 +1,15 @@
+name: ohmmeter
+extends: value-int
+init:
+  - !<set_io_type>
+    type: SWOSIO_OHMMETER
+    parameters:
+      - name: normallyOpen
+        type: boolean
+        defaultValue: false
+  - !<subscribe>
+members:
+  getResistance:
+    command: getResistance
+    parameters: []
+    returnType: float

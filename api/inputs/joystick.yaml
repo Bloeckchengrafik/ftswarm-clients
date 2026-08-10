@@ -1,0 +1,13 @@
+name: joystick
+init:
+  - !<subscribe>
+
+subscription: !<value>
+  parser: joystick
+  initialValue: &getValue
+    command: getValue
+    parameters: []
+    returnType: joystick
+
+members:
+  getValue: *getValue

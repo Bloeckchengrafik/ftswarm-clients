@@ -1,0 +1,21 @@
+members:
+  setSpeed:
+    command: setSpeed
+    parameters:
+      - name: speed
+        type: int
+    returnType: ok
+  getSpeed:
+    command: getSpeed
+    parameters: []
+    returnType: int
+  setMotionType:
+    command: setMotionType
+    parameters:
+      - name: motionType
+        type: int
+    returnType: ok
+  getMotionType:
+    command: getMotionType
+    parameters: []
+    returnType: int
