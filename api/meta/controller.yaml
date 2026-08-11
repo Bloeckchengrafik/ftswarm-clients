@@ -1,0 +1,20 @@
+name: controller
+members:
+  setMicrostepMode:
+    command: setMicrostepMode
+    parameters:
+      - name: mode
+        type: microstep_mode
+    returnType: ok
+  getMicrostepMode:
+    command: getMicrostepMode
+    parameters: []
+    returnType: microstep_mode
+  reboot:
+    command: reboot
+    parameters: []
+    returnType: ok
+  unsubscribe:
+    command: unsubscribe
+    parameters: []
+    returnType: ok

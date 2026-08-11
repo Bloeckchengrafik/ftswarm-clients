@@ -34,6 +34,13 @@ interface SubscriptionParser<T> {
             }
         }
 
+        val microstepMode = object : SubscriptionParser<MicrostepMode> {
+            override fun parse(value: String) = value.toIntOrNull()
+                ?.let(MicrostepMode::fromWireValue)
+                ?.let(Result.Companion::success)
+                ?: Result.failure(IllegalArgumentException("Invalid microstep mode: $value"))
+        }
+
         val joystick = object : SubscriptionParser<SubscriptionJoystickValue> {
             override fun parse(value: String) =
                 value.split(" ").takeIf { it.size == 2 }?.let {

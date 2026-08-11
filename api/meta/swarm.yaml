@@ -1,0 +1,25 @@
+name: swarm
+members:
+  login:
+    command: login
+    parameters:
+      - name: pin
+        type: int
+    returnType: ok
+  getSwarm:
+    command: getSwarm
+    parameters: []
+    constantParameters:
+      - type: int
+        value: 0
+    returnType: string
+  useConfig:
+    command: useConfig
+    parameters:
+      - name: config
+        type: int
+    returnType: ok
+  unsubscribe:
+    command: unsubscribe
+    parameters: []
+    returnType: ok

@@ -23,6 +23,12 @@ data class IoDefinition(
 )
 
 @Serializable
+data class MetaDefinition(
+    val name: String,
+    val members: Map<String, FunctionDefinition> = emptyMap(),
+)
+
+@Serializable
 sealed interface InitStep {
     @Serializable
     @SerialName("set_io_type")
@@ -78,8 +84,17 @@ enum class SubscriptionEnablement {
 data class FunctionDefinition(
     val command: String,
     val parameters: List<ParameterDefinition> = emptyList(),
+    val constantParameters: List<ConstantParameterDefinition> = emptyList(),
     val returnType: ApiType,
 )
+
+@Serializable
+data class ConstantParameterDefinition(
+    val type: ApiType,
+    val value: YamlNode,
+) {
+    fun valueText(): String? = (value as? YamlScalar)?.content
+}
 
 @Serializable
 data class ParameterDefinition(
@@ -107,6 +122,9 @@ enum class ApiType {
     @SerialName("joystick")
     Joystick,
 
+    @SerialName("microstep_mode")
+    MicrostepMode,
+
     @SerialName("ok")
     Ok,
 }
@@ -118,6 +136,31 @@ fun getIoDefinitions(basePath: Path): List<IoDefinition> {
     return definitionFiles
         .map { path -> decodeYamlNode<IoDefinition>(resolveTemplate(path, templates)) }
         .also(::validateIoDefinitions)
+}
+
+fun getMetaDefinitions(basePath: Path): List<MetaDefinition> {
+    val templates = loadTemplates(basePath / "templates")
+    val definitions = yamlFiles(basePath / "meta").map { path ->
+        decodeYamlNode<MetaDefinition>(resolveTemplate(path, templates)).also { definition ->
+            require(definition.name == path.nameWithoutExtension) {
+                "$path: meta definition name must match its file name"
+            }
+        }
+    }
+
+    val duplicateNames = definitions.groupBy { it.name }.filterValues { it.size > 1 }.keys
+    require(duplicateNames.isEmpty()) { "Duplicate meta definitions: ${duplicateNames.joinToString()}" }
+    definitions.forEach { definition ->
+        require(definition.name == "controller" || definition.name == "swarm") {
+            "${definition.name}: unsupported meta definition"
+        }
+        definition.members.forEach { (name, function) ->
+            require(name.isNotBlank()) { "${definition.name}: member names cannot be blank" }
+            validateFunction(definition.name, function)
+        }
+    }
+
+    return definitions
 }
 
 private fun loadTemplates(directory: Path): Map<String, YamlMap> =
@@ -249,6 +292,19 @@ private fun validateBitset(ioName: String, entries: List<BitsetEntry>) {
 private fun validateFunction(ioName: String, function: FunctionDefinition) {
     require(function.command.isNotBlank()) { "$ioName: command names cannot be blank" }
     function.parameters.forEach { validateParameter(ioName, it) }
+    function.constantParameters.forEach { validateConstantParameter(ioName, it) }
+}
+
+private fun validateConstantParameter(ioName: String, parameter: ConstantParameterDefinition) {
+    require(parameter.type != ApiType.Ok && parameter.type != ApiType.Joystick) {
+        "$ioName: ${parameter.type} cannot be used as a constant command parameter"
+    }
+    val value = requireNotNull(parameter.valueText()) {
+        "$ioName: constant command parameters must be scalar values"
+    }
+    require(parameter.type.acceptsLiteral(value)) {
+        "$ioName: invalid ${parameter.type} constant '$value'"
+    }
 }
 
 private fun validateParameter(ioName: String, parameter: ParameterDefinition) {
@@ -257,13 +313,15 @@ private fun validateParameter(ioName: String, parameter: ParameterDefinition) {
         "$ioName.${parameter.name}: ${parameter.type} cannot be used as a command parameter"
     }
     val default = parameter.defaultValueText() ?: return
-    val valid = when (parameter.type) {
-        ApiType.Boolean -> default.toBooleanStrictOrNull() != null
-        ApiType.Int -> default.toIntOrNull() != null
-        ApiType.Float -> default.toFloatOrNull() != null
-        ApiType.String -> true
-        ApiType.Joystick -> false
-        ApiType.Ok -> false
+    require(parameter.type.acceptsLiteral(default)) {
+        "$ioName.${parameter.name}: invalid ${parameter.type} default '$default'"
     }
-    require(valid) { "$ioName.${parameter.name}: invalid ${parameter.type} default '$default'" }
+}
+
+private fun ApiType.acceptsLiteral(value: String): Boolean = when (this) {
+    ApiType.Boolean -> value.toBooleanStrictOrNull() != null
+    ApiType.Int -> value.toIntOrNull() != null
+    ApiType.Float -> value.toFloatOrNull() != null
+    ApiType.String -> true
+    ApiType.Joystick, ApiType.MicrostepMode, ApiType.Ok -> false
 }

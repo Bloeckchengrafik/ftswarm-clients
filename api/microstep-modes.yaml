@@ -1,0 +1,10 @@
+- name: Full
+  value: 0
+- name: Half
+  value: 4
+- name: Quarter
+  value: 2
+- name: Eighth
+  value: 6
+- name: Sixteenth
+  value: 7

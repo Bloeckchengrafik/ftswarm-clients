@@ -3,6 +3,7 @@ package io.github.elektrofuzzis.ftswarm_clients.codegen.kotlin
 import io.github.elektrofuzzis.ftswarm_clients.codegen.CodeGenUnit
 import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.ApiType
 import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.BitsetEntry
+import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.ConstantParameterDefinition
 import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.FunctionDefinition
 import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.InitStep
 import io.github.elektrofuzzis.ftswarm_clients.codegen.collector.IoDefinition
@@ -25,6 +26,9 @@ private fun renderIoObject(definition: IoDefinition): String {
     val subscription = definition.subscription
     val usesJoystick = definition.members.values.any { it.returnType == ApiType.Joystick } ||
         (subscription is SubscriptionDefinition.Value && subscription.parser == ApiType.Joystick)
+    val usesMicrostepMode = definition.members.values.any { function ->
+        function.returnType == ApiType.MicrostepMode || function.parameters.any { it.type == ApiType.MicrostepMode }
+    } || (subscription is SubscriptionDefinition.Value && subscription.parser == ApiType.MicrostepMode)
 
     return buildString {
         appendLine("package io.github.elektrofuzzis.ftswarm_clients.kotlin.objects")
@@ -39,6 +43,9 @@ private fun renderIoObject(definition: IoDefinition): String {
         appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.ReturnValueParser")
         if (usesJoystick) {
             appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.SubscriptionJoystickValue")
+        }
+        if (usesMicrostepMode) {
+            appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.MicrostepMode")
         }
         if (subscription != null) {
             appendLine("import io.github.elektrofuzzis.ftswarm_clients.kotlin.domain.SubscriptionParser")
@@ -188,13 +195,14 @@ private fun StringBuilder.appendSubscribeCommand(parameter: String? = null) {
     appendLine("    ).getOrThrow()")
 }
 
-private fun StringBuilder.appendCommandFunction(
+internal fun StringBuilder.appendCommandFunction(
     ioName: String,
     memberName: String,
     function: FunctionDefinition,
+    targetName: String = "port",
 ) {
     val helperName = ioName.commandHelperName(memberName)
-    append("private suspend fun FtSwarmTransactionContext.$helperName(port: String")
+    append("private suspend fun FtSwarmTransactionContext.$helperName($targetName: String")
     function.parameters.forEach { parameter ->
         append(", ${parameter.name}: ${parameter.type.kotlinType()}")
     }
@@ -205,10 +213,13 @@ private fun StringBuilder.appendCommandFunction(
     appendLine("    ${resultPrefix}command(")
     appendLine("        CommandRequest(")
     appendLine("            Command(")
-    appendLine("                port,")
+    appendLine("                $targetName,")
     appendLine("                \"${function.command}\",")
     function.parameters.forEach { parameter ->
         appendLine("                ${parameter.commandParameter(parameter.name)},")
+    }
+    function.constantParameters.forEach { parameter ->
+        appendLine("                ${parameter.commandParameter()},")
     }
     appendLine("            ),")
     appendLine("            ReturnValueParser.${function.returnType.returnValueParser()},")
@@ -329,7 +340,7 @@ private fun subscriptionPropertyName(function: FunctionDefinition): String =
         else -> function.command
     }
 
-private fun StringBuilder.appendParameters(
+internal fun StringBuilder.appendParameters(
     parameters: List<ParameterDefinition>,
     includeDefaults: Boolean,
 ) {
@@ -343,20 +354,30 @@ private fun StringBuilder.appendParameters(
 }
 
 private fun ParameterDefinition.renderDefault(value: String): String =
-    when (type) {
+    type.renderLiteral(value)
+
+private fun ApiType.renderLiteral(value: String): String =
+    when (this) {
         ApiType.String -> "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
         else -> value
     }
 
 private fun ParameterDefinition.commandParameter(value: String): String =
-    "Command.Parameter.${type.commandParameter()}($value)"
+    when (type) {
+        ApiType.MicrostepMode -> "Command.Parameter.int($value.wireValue)"
+        else -> "Command.Parameter.${type.commandParameter()}($value)"
+    }
 
-private fun ApiType.kotlinType(): String = when (this) {
+private fun ConstantParameterDefinition.commandParameter(): String =
+    "Command.Parameter.${type.commandParameter()}(${type.renderLiteral(requireNotNull(valueText()))})"
+
+internal fun ApiType.kotlinType(): String = when (this) {
     ApiType.Boolean -> "Boolean"
     ApiType.Int -> "Int"
     ApiType.Float -> "Float"
     ApiType.String -> "String"
     ApiType.Joystick -> "SubscriptionJoystickValue"
+    ApiType.MicrostepMode -> "MicrostepMode"
     ApiType.Ok -> "Unit"
 }
 
@@ -366,6 +387,7 @@ private fun ApiType.commandParameter(): String = when (this) {
     ApiType.Float -> "float"
     ApiType.String -> "string"
     ApiType.Joystick -> error("joystick is not a command parameter type")
+    ApiType.MicrostepMode -> error("microstep mode constants require a named mode")
     ApiType.Ok -> error("ok is not a command parameter type")
 }
 
@@ -375,6 +397,7 @@ private fun ApiType.returnValueParser(): String = when (this) {
     ApiType.Float -> "FloatValue"
     ApiType.String -> "StringValue"
     ApiType.Joystick -> "JoystickValue"
+    ApiType.MicrostepMode -> "MicrostepModeValue"
     ApiType.Ok -> "Ok"
 }
 
@@ -384,13 +407,14 @@ private fun ApiType.subscriptionParser(): String = when (this) {
     ApiType.Float -> "float"
     ApiType.String -> "string"
     ApiType.Joystick -> "joystick"
+    ApiType.MicrostepMode -> "microstepMode"
     ApiType.Ok -> error("ok is not a subscription value type")
 }
 
-private fun String.commandHelperName(command: String): String =
+internal fun String.commandHelperName(command: String): String =
     this + command.toPascalCase()
 
-private fun String.toPascalCase(): String =
+internal fun String.toPascalCase(): String =
     split(Regex("[^A-Za-z0-9]+"))
         .filter(String::isNotEmpty)
         .joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }

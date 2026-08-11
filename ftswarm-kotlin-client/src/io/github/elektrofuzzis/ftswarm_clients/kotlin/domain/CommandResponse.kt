@@ -6,6 +6,7 @@ sealed interface SucceedingCommandReturnValue {
     data class BooleanValue(val value: Boolean) : SucceedingCommandReturnValue
     data class StringValue(val value: String) : SucceedingCommandReturnValue
     data class FloatValue(val value: Float) : SucceedingCommandReturnValue
+    data class MicrostepModeValue(val value: MicrostepMode) : SucceedingCommandReturnValue
     data class JoystickValue(val lr: Float, val fb: Float) : SucceedingCommandReturnValue {
         val value: SubscriptionJoystickValue
             get() = SubscriptionJoystickValue(lr, fb)
@@ -52,6 +53,16 @@ sealed interface ReturnValueParser<T : SucceedingCommandReturnValue> {
         override fun parse(value: String): Result<SucceedingCommandReturnValue.FloatValue> {
             return value.toFloatOrNull()?.let { Result.success(SucceedingCommandReturnValue.FloatValue(it)) }
                 ?: Result.failure(IllegalArgumentException("Invalid response: $value"))
+        }
+    }
+
+    data object MicrostepModeValue : ReturnValueParser<SucceedingCommandReturnValue.MicrostepModeValue> {
+        override fun parse(value: String): Result<SucceedingCommandReturnValue.MicrostepModeValue> {
+            val wireValue = value.toIntOrNull()
+                ?: return Result.failure(IllegalArgumentException("Invalid response: $value"))
+            val mode = MicrostepMode.fromWireValue(wireValue)
+                ?: return Result.failure(IllegalArgumentException("Unknown microstep mode: $wireValue"))
+            return Result.success(SucceedingCommandReturnValue.MicrostepModeValue(mode))
         }
     }
 

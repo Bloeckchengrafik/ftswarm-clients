@@ -1,7 +1,7 @@
 product: jvm/lib
 
 dependencies:
-  - $libs.kotlinx.coroutines.core
+  - $libs.kotlinx.coroutines.core: exported
   - $libs.jSerialComm
   - $libs.kotlin.logging.jvm
   - $libs.slf4j.api
