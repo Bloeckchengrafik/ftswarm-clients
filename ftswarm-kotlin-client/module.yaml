@@ -12,3 +12,20 @@ plugins:
 
 apply:
   - ../common.module-template.yaml
+
+repositories:
+  - id: github
+    url: https://maven.pkg.github.com/bloeckchengrafik/ftswarm-clients
+    publish: true
+    credentials:
+      file: ../github.properties
+      usernameKey: github.username
+      passwordKey: github.token
+
+settings:
+  publishing:
+    enabled: true
+    group: io.github.elektrofuzzis.ftswarm_clients
+    artifactId: ftswarm-kotlin-client
+    version: 0.1.0-SNAPSHOT
+
