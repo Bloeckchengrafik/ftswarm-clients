@@ -9,8 +9,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import java.io.Closeable
 import kotlin.coroutines.CoroutineContext
 
-suspend fun FtSwarmClient(port: SerialPortIdentifier): FtSwarmClient {
-    val parentContext = currentCoroutineContext()
+suspend fun FtSwarmClient(port: SerialPortIdentifier, parent: CoroutineContext?): FtSwarmClient {
+    val parentContext = parent ?: currentCoroutineContext()
     val job = SupervisorJob(parentContext[Job])
 
     return FtSwarmClient(

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ftswarm-client"
+version = "0.1.0"
+description = "Synchronous and asyncio-native Python client for ftSwarm"
+requires-python = ">=3.11"
+dependencies = ["pyserial>=3.5,<4"]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.25"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ftswarm_client"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+asyncio_mode = "auto"

@@ -3,6 +3,10 @@ tasks:
     action: !io.github.elektrofuzzis.ftswarm_clients.codegen.generateKotlinSources
       apiDefPath: ${project.rootDir}/api
       generatedSourceDir: ${taskOutputDir}
+  generatePython:
+    action: !io.github.elektrofuzzis.ftswarm_clients.codegen.generatePythonSources
+      apiDefPath: ${project.rootDir}/api
+      generatedSourceDir: ${project.rootDir}/ftswarm-python-client/src/ftswarm_client/generated
 
 generated:
   sources:
