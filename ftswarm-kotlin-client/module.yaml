@@ -27,5 +27,5 @@ settings:
     enabled: true
     group: io.github.elektrofuzzis.ftswarm_clients
     artifactId: ftswarm-kotlin-client
-    version: 0.1.0R1-SNAPSHOT
+    version: 0.1.1
 
